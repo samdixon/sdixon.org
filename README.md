@@ -1,1 +1,0 @@
-# sdixon.org
