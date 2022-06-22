@@ -1,6 +1,7 @@
 import {
   app,
   get,
+  App,
   post,
   redirect,
   contentType,
@@ -8,5 +9,5 @@ import {
 import { renderFile } from 'https://deno.land/x/dejs/mod.ts';
 
 app(
-  get('/', async () => await renderFile('index.ejs', { message: 'example' }))
+  get('/', async () => new Response(await renderFile('index.ejs', { message: 'example' })))
 );
