@@ -4,7 +4,11 @@ import * as eta from "https://deno.land/x/eta@v1.12.3/mod.ts"
 
 const templateDir = `${Deno.cwd()}/templates`;
 
-async function renderTemplateSync(path) {
+for await (const dirEntry of Deno.readDir(templateDir)) {
+  console.log(dirEntry);
+}
+
+async function renderTemplate(path) {
   return new Response(await eta.renderFile(`${templateDir}/${path}`), {
     headers: {
       'content-type': 'text/html'
@@ -13,10 +17,10 @@ async function renderTemplateSync(path) {
 }
 
 serve({
-  "/": () => renderTemplateSync('index.ejs'),
-  "/projects": () => renderTemplateSync('projects.ejs'),
-  "/about": () => renderTemplateSync('about.ejs'),
-  "/blog": () => renderTemplateSync('blog.ejs'),
+  "/": () => renderTemplate('index.ejs'),
+  "/projects": () => renderTemplate('projects.ejs'),
+  "/about": () => renderTemplate('about.ejs'),
+  "/blog": () => renderTemplate('blog.ejs'),
   "/blog/:slug": (_req, _conn, params) => {
     const post = `Hello, you visited ${params.slug}!`;
     return new Response(post);
