@@ -1,11 +1,11 @@
 const { cwd, stdout, copy } = Deno;
 import { serve } from "https://deno.land/x/sift@0.5.0/mod.ts";
-import { renderFileToString } from 'https://deno.land/x/dejs/mod.ts';
+import { renderFile } from 'https://deno.land/x/dejs/mod.ts';
 
 const templateDir = "templates";
 
 async function renderTemplateSync(path) {
-  return new Response(await renderFileToString(`${templateDir}/${path}`), {
+  return new Response(await renderFile(`${templateDir}/${path}`), {
     headers: {
       'content-type': 'text/html'
     }
