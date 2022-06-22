@@ -5,7 +5,7 @@ import { renderFile } from 'https://deno.land/x/dejs/mod.ts';
 const templateDir = "templates";
 
 async function renderTemplateSync(path) {
-  return new Response(await renderFile(`${templateDir}/${path}`), {
+  return new Response(await Deno.readTextFile(`${templateDir}/${path}`), {
     headers: {
       'content-type': 'text/html'
     }
