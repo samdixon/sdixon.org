@@ -1,0 +1,46 @@
+@import url("/static/font.css");
+
+/* Global Settings*/
+body {
+    max-width: 100%;
+    background-color: #FFFAF1;
+    font-family: 'Source Sans 3', sans-serif !important;
+}
+
+/* Global Font Settings*/
+h4 {
+    font-weight: 400;
+    margin: 0;
+}
+
+a {
+    color: #004394;
+    text-decoration: none;
+    word-wrap: break-word;
+}
+
+
+/* Main Body Settings */
+#wrapper {
+    max-width: 768px;
+    padding-left: .8em;
+}
+
+/* Nav */
+nav {
+    padding-right: 15px;
+    padding-top: .8em;
+    padding-bottom: 1em;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+
+nav ul li.active {
+    text-decoration: underline;
+}
+
