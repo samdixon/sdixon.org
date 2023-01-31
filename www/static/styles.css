@@ -19,7 +19,6 @@ a {
     word-wrap: break-word;
 }
 
-
 /* Main Body Settings */
 #wrapper {
     max-width: 768px;
@@ -39,8 +38,6 @@ nav ul {
     margin: 0;
 }
 
-
 nav ul li.active {
     text-decoration: underline;
 }
-
