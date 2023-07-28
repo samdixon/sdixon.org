@@ -3,7 +3,7 @@
 body {
     max-width: 100%;
     background-color: #FFFAF1;
-    font-family: 'Source Sans 3', sans-serif !important;
+    font-family: sans-serif;
 }
 
 #wrapper {
