@@ -12,12 +12,6 @@ body {
     padding-left: .8em;
 }
 
-h4 {
-    font-weight: 500;
-    margin: 0;
-    padding-bottom: .2em;
-}
-
 a {
     color: #004394;
     text-decoration: none;
@@ -31,4 +25,6 @@ ul {
 
 li {
     padding-bottom: .2em;
+    padding-left: .2em;
+    display: inline;
 }
