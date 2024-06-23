@@ -1,0 +1,17 @@
+{% extends 'base.html' %} {% block content %}
+<p>Personal list of internet 'best hits' I've found</p>
+<h4>On CloudFlare's architecture...</h4>
+<blockquote>
+    <p>
+        Everything was controlled by a single Postgres database that made very
+        heavy use of stored procedures, that called other procedures, that
+        called others. It was one giant program inside the database. It took me
+        a while to comprehend what he'd done but it was really great. The
+        database ran everything and all those functions made sure that audit
+        logs were kept, that the calls were allowed for the user ID being passed
+        in, and some of these procedures made external calls to APIs including
+        getting things like SSL certificates.
+    </p>
+    <p>It was a magnificent monolith inside a database.</p>
+</blockquote>
+{% endblock %}
