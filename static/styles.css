@@ -2,14 +2,14 @@
 
 body {
     max-width: 100%;
-    background-color: #FFFAF1;
+    background-color: #fffaf1;
     font-family: sans-serif;
 }
 
 #wrapper {
     max-width: 768px;
-    padding-top: .8em;
-    padding-left: .8em;
+    padding-top: 0.8em;
+    padding-left: 0.8em;
 }
 
 a {
@@ -24,7 +24,10 @@ ul {
 }
 
 li {
-    padding-bottom: .2em;
-    padding-left: .2em;
-    display: inline;
+    padding-bottom: 0.2em;
+    padding-left: 0.2em;
+}
+
+blockquote {
+    font-style: italic;
 }
