@@ -1,33 +1,16 @@
-@import url("/static/font.css");
+html {
+    background-color: #fffaf1;
+}
 
 body {
-    max-width: 100%;
-    background-color: #fffaf1;
-    font-family: sans-serif;
+    max-width: 768px;
 }
 
 #wrapper {
     max-width: 768px;
-    padding-top: 0.8em;
     padding-left: 0.8em;
 }
 
-a {
-    color: #004394;
-    text-decoration: none;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-li {
-    padding-bottom: 0.2em;
-    padding-left: 0.2em;
-}
-
-blockquote {
-    font-style: italic;
+.container {
+    margin-left: 1em;
 }

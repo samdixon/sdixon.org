@@ -1,5 +1,5 @@
 clean:
-    rm -rf dist
+	rm -rf dist
 
 runserver:
-	python3 -m http.server 8080 -d www/
+	python devserver.py
