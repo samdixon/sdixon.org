@@ -1,8 +1,39 @@
 {% extends 'base.html' %} {% block content %}
-<p>Personal list of internet 'best hits' I've found</p>
+<p>Some good nuggets</p>
 
 <article>
-    <h5>Early Git Stories</h5>
+    <h5>Porsche Cup Braking Tips</h5>
+    <blockquote>
+        <p>
+            HOW you apply the brakes can matter just as much as how much you apply it. Remember that your wheels are unsprung, while the car chassis is sprung. That means they are actually two fully independent physical objects when we're talking very short amounts of time. If you go from 0% brake to 80% brake in literally 1 frame of game time, the tires don't actually carry the full force of the car optimally.
+        </p>
+
+        <p>
+            When you brake the entire chassis will move and dive over the front axle. This means the front tires carry more of the total weight of the car, and the tires have increased friction. This also means they can brake harder. But it takes time. Likewise the rear tires lose a little of the brake capacity since they now have less friction.
+        </p>
+
+        <p>
+            Imagine that when you are at 80% brakes you use 99% of the front tires max grip available, when the tires are fully loaded. If you slam the brakes in the aforementioned 1 frame of game time the tires never get to be fully loaded before the brake pads clamp on the brake disc with enough force to break the friction threshold of your tire, causing them to lock up. If you do this and move the brake bias towards the rear (as a measure to try and avoid front tire lockup), you now most likely move so much brake force to the rear that when your rear tires gets unloaded as the front dives, they now exceed their friction threshold and lock up.
+        </p>
+
+        <p>
+            Try and adjust how you brake, not just the brake balance. Let the car physically dive, to where you see your front actually move down, then reach max brake values. Then slowly progress to faster and faster braking until you start locking up again.
+        </p>
+        
+        <footer>
+            <cite
+                >—
+                <a
+                    href="https://old.reddit.com/r/iRacing/comments/1elbaff/brake_bias_for_porsche_cup/lgqldop/"
+                    target="_blank"
+                    >halstoy</a
+                ></cite
+            >
+        </footer>
+    </blockquote>
+</article>
+<article>
+    <h5>Early Git stories</h5>
     <blockquote>
         <a href="https://blog.brachiosoft.com/en/posts/git/" target="_blank">
             A Git story: Not so fun this time
@@ -10,7 +41,7 @@
     </blockquote>
 </article>
 <article>
-    <h5>Early CloudFlare's architecture...</h5>
+    <h5>On early cloudflare architecture...</h5>
     <blockquote>
         <p>
             Everything was controlled by a single Postgres database that made
