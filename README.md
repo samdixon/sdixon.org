@@ -1,10 +1,15 @@
 ## sdixon.org
 
-simple static site connected to cloudflare pages
+static site for sdixon.org
 
-## local dev
+## running locally
 ```
-python3 -m http.server <PORT> -d www/
+make runserver
+```
+
+## building locally
+```
+make build
 ```
 
 ## remote dev

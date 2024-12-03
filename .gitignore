@@ -1,2 +1,5 @@
 dist
 .venv
+build
+.DS_Store
+.idea

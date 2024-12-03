@@ -3,3 +3,6 @@ clean:
 
 runserver:
 	python devserver.py
+	
+build:
+	python build.py

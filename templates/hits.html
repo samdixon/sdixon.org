@@ -1,81 +1,30 @@
-{% extends 'base.html' %} {% block content %}
-<p>Some good nuggets</p>
+{% extends 'base.html' %}
 
+{% block content %}
+
+<p>things on the web worth sharing</p>
+
+{% for hit in context.hits %}
 <article>
-    <h5>Porsche Cup Braking Tips</h5>
+    <h3>{{hit.title}}</h3>
     <blockquote>
-        <p>
-            HOW you apply the brakes can matter just as much as how much you apply it. Remember that your wheels are unsprung, while the car chassis is sprung. That means they are actually two fully independent physical objects when we're talking very short amounts of time. If you go from 0% brake to 80% brake in literally 1 frame of game time, the tires don't actually carry the full force of the car optimally.
-        </p>
-
-        <p>
-            When you brake the entire chassis will move and dive over the front axle. This means the front tires carry more of the total weight of the car, and the tires have increased friction. This also means they can brake harder. But it takes time. Likewise the rear tires lose a little of the brake capacity since they now have less friction.
-        </p>
-
-        <p>
-            Imagine that when you are at 80% brakes you use 99% of the front tires max grip available, when the tires are fully loaded. If you slam the brakes in the aforementioned 1 frame of game time the tires never get to be fully loaded before the brake pads clamp on the brake disc with enough force to break the friction threshold of your tire, causing them to lock up. If you do this and move the brake bias towards the rear (as a measure to try and avoid front tire lockup), you now most likely move so much brake force to the rear that when your rear tires gets unloaded as the front dives, they now exceed their friction threshold and lock up.
-        </p>
-
-        <p>
-            Try and adjust how you brake, not just the brake balance. Let the car physically dive, to where you see your front actually move down, then reach max brake values. Then slowly progress to faster and faster braking until you start locking up again.
-        </p>
-        
+        {% for line in hit.blockquote %}
+        <p>{{line}}</p>
+        {% endfor %}
+        {% if hit.cite %}
         <footer>
             <cite
-                >—
-                <a
-                    href="https://old.reddit.com/r/iRacing/comments/1elbaff/brake_bias_for_porsche_cup/lgqldop/"
-                    target="_blank"
-                    >halstoy</a
-                ></cite
-            >
+            >—
+            <a
+                href="{{hit.href}}"
+                target="_blank"
+                >{{hit.cite}}</a
+            ></cite>
         </footer>
+        {% else %}
+        <a href="{{hit.href}}" target="_blank">source</a>
+        {% endif %}
     </blockquote>
 </article>
-<article>
-    <h5>Early Git stories</h5>
-    <blockquote>
-        <a href="https://blog.brachiosoft.com/en/posts/git/" target="_blank">
-            A Git story: Not so fun this time
-        </a>
-    </blockquote>
-</article>
-<article>
-    <h5>On early cloudflare architecture...</h5>
-    <blockquote>
-        <p>
-            Everything was controlled by a single Postgres database that made
-            very heavy use of stored procedures, that called other procedures,
-            that called others. It was one giant program inside the database. It
-            took me a while to comprehend what he'd done but it was really
-            great. The database ran everything and all those functions made sure
-            that audit logs were kept, that the calls were allowed for the user
-            ID being passed in, and some of these procedures made external calls
-            to APIs including getting things like SSL certificates.
-        </p>
-        <p>It was a magnificent monolith inside a database.</p>
-        <footer>
-            <cite
-                >—
-                <a
-                    href="https://news.ycombinator.com/item?id=22883548"
-                    target="_blank"
-                    >jgrahamc</a
-                ></cite
-            >
-        </footer>
-    </blockquote>
-</article>
-
-<article>
-    <h5>
-        Link Hints - A browser extension that lets you click with your keyboard.
-    </h5>
-    <p>
-        a nice little tool that lets you jump to any link on a webpage via the
-        keyboard
-    </p>
-    <a href="https://lydell.github.io/LinkHints/" target="_blank">source</a>
-</article>
-
+{% endfor %}
 {% endblock %}
