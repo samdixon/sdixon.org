@@ -1,0 +1,12 @@
+[project]
+name = "sdixon-org"
+version = "0.1.0"
+description = "static site for sdixon.org"
+requires-python = ">=3.12"
+dependencies = [
+    "Flask==3.0.3",
+    "Frozen-Flask==1.0.2",
+]
+
+[tool.uv]
+package = false
