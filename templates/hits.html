@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<h2 class="page-title">hits</h2>
 
 <p>things on the web worth sharing</p>
 
@@ -18,11 +19,12 @@
             <a
                 href="{{hit.href}}"
                 target="_blank"
+                rel="noopener noreferrer"
                 >{{hit.cite}}</a
             ></cite>
         </footer>
         {% else %}
-        <a href="{{hit.href}}" target="_blank">source</a>
+        <a href="{{hit.href}}" target="_blank" rel="noopener noreferrer">source</a>
         {% endif %}
     </blockquote>
 </article>

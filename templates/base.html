@@ -6,46 +6,211 @@
         <meta name="description" content="personal website of Sam Dixon." />
         <meta name="author" content="Sam Dixon" />
         <meta name="keywords" content="Sam Dixon Indianapolis, IN" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Sam Dixon" />
+        <meta property="og:description" content="Personal website of Sam Dixon." />
+        <meta property="og:url" content="https://sdixon.org" />
+        <meta property="og:image" content="https://sdixon.org/static/img/wizard.png" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Sam Dixon" />
+        <meta name="twitter:description" content="Personal website of Sam Dixon." />
+        <meta name="twitter:image" content="https://sdixon.org/static/img/wizard.png" />
         <link rel="icon" href="/static/img/wizard.png" sizes="any" />
         <title>sdixon</title>
     </head>
     <body>
         <style>
-				html, body { 
-					font-family: sans-serif;
-					max-width: 30rem; 
-					color: hsl(28,26%,25%);
-					background-color: hsl(32,16%,96%);
-				}
-				h1, h3, h4 {
-					font-family: serif;
-					font-weight: 900;
-                    border-bottom: 1px dotted black;
-                    margin: 0;
-                    display: inline;
-				}
-                ul, li {
-                    list-style: none;
-                    padding: .1em;
-                    padding-left: 0;
+            *, *::before, *::after {
+                box-sizing: border-box;
+            }
+            html, body {
+                font-family: sans-serif;
+                max-width: 38rem;
+                margin: 4rem 0 2rem 6rem;
+                padding: 0 1.5rem;
+                color: hsl(28,26%,25%);
+                background-color: hsl(32,16%,96%);
+                font-size: 16px;
+                line-height: 1.6;
+            }
+            @media (max-width: 700px) {
+                html, body {
+                    margin: 2rem auto;
                 }
-                a {
-                    text-decoration: none;
-                }
+            }
+            a {
+                text-decoration: none;
+                color: hsl(28,40%,35%);
+                font-style: italic;
+                transition: color 0.15s ease;
+            }
+            a:hover {
+                color: hsl(28,60%,45%);
+            }
+            p {
+                margin: 1rem 0;
+            }
+
+            /* ── Frontpage ─────────────────────────────── */
+            .name-row {
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+                margin: 0 0 0.3rem;
+            }
+            h1.name {
+                font-family: sans-serif;
+                font-size: 1.7rem;
+                font-weight: 300;
+                font-style: italic;
+                letter-spacing: -0.01em;
+                margin: 0;
+                color: hsl(28,30%,18%);
+            }
+            .wizard-sprite {
+                width: 74px;
+                height: 66px;
+                background: url('/static/img/wizard_walk.png') 0 0 no-repeat;
+                background-size: 370px 66px;
+                image-rendering: pixelated;
+                image-rendering: crisp-edges;
+                animation: wizard-idle 0.8s steps(5) infinite;
+                flex-shrink: 0;
+            }
+            @keyframes wizard-idle {
+                from { background-position: 0 0; }
+                to   { background-position: -370px 0; }
+            }
+            .tagline {
+                font-size: 0.92rem;
+                color: hsl(28,20%,52%);
+                margin: 0 0 2rem;
+            }
+            .links {
+                display: table;
+                border-collapse: collapse;
+                margin-bottom: 2rem;
+            }
+            .link-row {
+                display: table-row;
+            }
+            .link-label {
+                display: table-cell;
+                padding-right: 2.2rem;
+                padding-bottom: 0.3rem;
+                color: hsl(28,18%,55%);
+                font-size: 0.85rem;
+                font-family: monospace;
+                letter-spacing: 0.02em;
+                white-space: nowrap;
+                vertical-align: baseline;
+            }
+            .link-value {
+                display: table-cell;
+                padding-bottom: 0.3rem;
+                font-size: 0.92rem;
+                vertical-align: baseline;
+            }
+            a[href^="mailto:"] {
+                font-family: monospace;
+                font-size: 0.9em;
+            }
+            .moreinfo {
+                max-width: 28rem;
+                color: hsl(28,22%,40%);
+                font-size: 0.92rem;
+                border-top: 1px solid hsl(28,15%,85%);
+                padding-top: 1.25rem;
+                margin-top: 0.5rem;
+            }
+            .moreinfo p {
+                margin: 0 0 0.6rem;
+            }
+
+            /* ── Inner pages ────────────────────────────── */
+            .site-header {
+                margin-bottom: 2.5rem;
+            }
+            .site-header a.home {
+                font-family: monospace;
+                font-size: 0.9rem;
+                font-weight: 700;
+                letter-spacing: -0.04em;
+                color: hsl(28,28%,38%);
+                display: inline-flex;
+                align-items: center;
+                gap: 0.3rem;
+            }
+            .site-header a.home:hover {
+                color: hsl(28,50%,42%);
+            }
+            .site-header a.home::before {
+                content: "↜";
+                font-style: normal;
+                font-weight: 400;
+            }
+            h2.page-title {
+                font-family: serif;
+                font-size: 1.5rem;
+                font-weight: 900;
+                letter-spacing: -0.01em;
+                margin: 0 0 1.5rem;
+                color: hsl(28,30%,20%);
+            }
+            h3 {
+                font-family: sans-serif;
+                font-size: 1rem;
+                font-weight: 700;
+                margin: 0 0 0.4rem;
+                color: hsl(28,26%,22%);
+            }
+            ul, li {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+            article {
+                margin: 2rem 0;
+                padding-bottom: 2rem;
+                border-bottom: 1px solid hsl(28,15%,88%);
+            }
+            article:last-of-type {
+                border-bottom: none;
+            }
+            blockquote {
+                margin: 0.75rem 0 0;
+                padding: 0.9rem 1.2rem;
+                background-color: hsl(35,25%,97%);
+                border-left: 3px solid hsl(28,25%,72%);
+                font-size: 0.92rem;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            }
+            blockquote p {
+                margin: 0.4rem 0;
+            }
+            blockquote p:first-child { margin-top: 0; }
+            blockquote p:last-child  { margin-bottom: 0; }
+            blockquote footer {
+                margin-top: 0.75rem;
+                font-style: italic;
+                font-size: 0.88em;
+                color: hsl(28,22%,48%);
+            }
+            blockquote a {
+                font-weight: 500;
+                text-decoration: underline;
+                text-decoration-style: dotted;
+            }
+            cite { font-style: italic; }
         </style>
-                <header>
-                    <h3>Sam Dixon</h3>
-                    <nav>
-                        <ul>
-                            <li><a href="{{ url_for('about') }}" {% if context.about%}style="border-bottom: 1px dotted black;"{%endif%}>me</a></li>
-                            <li><a href="{{ url_for('hits') }}" {% if context.hits_flag%}style="border-bottom: 1px dotted black;"{%endif%}>hits</a></li>
-                        </ul>
-                    </nav >
-                </header>
-                <section>
-                    {% block content %}
-                    {% endblock %}
-                </section>
-            </div>
+
+        {% block page %}
+        <header class="site-header">
+            <a href="{{ url_for('index') }}" class="home">sam dixon</a>
+        </header>
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+        {% endblock %}
     </body>
 </html>

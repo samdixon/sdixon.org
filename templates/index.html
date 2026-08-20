@@ -1,1 +1,27 @@
 {% extends 'base.html' %}
+
+{% block page %}
+<main>
+<div class="name-row">
+    <div class="wizard-sprite" aria-hidden="true"></div>
+    <h1 class="name">Sam Dixon</h1>
+</div>
+
+
+<div class="links">
+    <div class="link-row">
+        <span class="link-label">email</span>
+        <span class="link-value"><a href="mailto:sdixon@posteo.net">sdixon@posteo.net</a></span>
+    </div>
+    <div class="link-row">
+        <span class="link-label">github</span>
+        <span class="link-value"><a href="https://github.com/samdixon">@samdixon</a></span>
+    </div>
+    <div class="link-row">
+        <span class="link-label">hits</span>
+        <span class="link-value"><a href="{{ url_for('hits') }}">↝</a></span>
+    </div>
+</div>
+</main>
+
+{% endblock %}
