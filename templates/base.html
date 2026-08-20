@@ -38,6 +38,16 @@
                 /* Accent picked off the wizard's robe. */
                 --link: hsl(215,45%,34%);
                 --link-hover: hsl(215,55%,25%);
+
+                /* Letterpress. Light comes from above, so the lower lip of a
+                   pressed impression catches a highlight and the upper edge
+                   falls into shadow. Reverse the two to emboss instead. */
+                --deboss:
+                    0 1px 0 hsl(40 60% 100% / .92),
+                    0 -1px 1px hsl(28 35% 28% / .17);
+                --deboss-soft:
+                    0 1px 0 hsl(40 60% 100% / .8),
+                    0 -1px 1px hsl(28 35% 28% / .11);
             }
 
             *, *::before, *::after {
@@ -63,25 +73,51 @@
 
             /* ── The card itself ───────────────────────── */
             .paper {
+                position: relative;
                 max-width: 26rem;
                 background-color: var(--paper);
-                background-image: linear-gradient(hsl(32,20%,97.5%), hsl(32,14%,95%));
-                border: 1px solid hsl(30,16%,84%);
+                /* Paper grain over an uneven-light gradient. Light falls from
+                   the upper left, which every shadow below agrees with. */
+                background-image:
+                    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23g)' opacity='.055'/%3E%3C/svg%3E"),
+                    linear-gradient(158deg, hsl(32,22%,98%) 0%, hsl(32,16%,96%) 45%, hsl(32,13%,94.2%) 100%);
                 border-radius: 3px;
                 padding: 2.2rem 2.4rem 2.4rem;
+                /* Card stock has thickness: a bright top lip, a dark bottom
+                   edge, then the contact shadow and the cast shadow. */
                 box-shadow:
-                    0 1px 1px   hsl(30 25% 28% / .13),
-                    0 4px 8px   hsl(30 25% 28% / .10),
-                    0 12px 26px hsl(30 25% 28% / .12),
-                    0 26px 54px hsl(30 25% 28% / .09);
+                    inset 0 1px 0 hsl(40 50% 100% / .7),
+                    inset 0 -1px 0 hsl(30 20% 72% / .5),
+                    0 0 0 1px hsl(30 16% 82% / .9),
+                    1px 1px 1px   hsl(30 25% 28% / .13),
+                    2px 4px 8px   hsl(30 25% 28% / .10),
+                    5px 12px 26px hsl(30 25% 28% / .12),
+                    9px 26px 54px hsl(30 25% 28% / .09);
             }
             /* Front page keeps roughly the proportions of a real 3.5×2in card. */
             .paper.card {
                 min-height: 14.9rem;
             }
-            /* Inner pages are the same stock, just a taller sheet. */
+            /* Inner pages are the same stock, just a taller sheet — squared up,
+               because you read them. */
             .paper.sheet {
                 max-width: 34rem;
+            }
+            @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+                .paper.card {
+                    transition: transform .3s ease, box-shadow .3s ease;
+                }
+                .paper.card:hover {
+                    transform: translateY(-3px);
+                    box-shadow:
+                        inset 0 1px 0 hsl(40 50% 100% / .7),
+                        inset 0 -1px 0 hsl(30 20% 72% / .5),
+                        0 0 0 1px hsl(30 16% 82% / .9),
+                        1px 2px 2px    hsl(30 25% 28% / .12),
+                        3px 6px 12px   hsl(30 25% 28% / .10),
+                        7px 18px 36px  hsl(30 25% 28% / .12),
+                        13px 36px 70px hsl(30 25% 28% / .10);
+                }
             }
             @media (max-width: 44rem) {
                 .paper { padding: 1.6rem 1.5rem 1.8rem; }
@@ -114,7 +150,7 @@
                 display: flex;
                 align-items: center;
                 gap: 0.7rem;
-                margin: 0 0 1.4rem;
+                margin: 0;
             }
             h1.name {
                 font-size: 1.7rem;
@@ -122,12 +158,36 @@
                 letter-spacing: -0.01em;
                 margin: 0;
                 color: var(--ink-strong);
+                text-shadow: var(--deboss);
             }
+            /* The mark is struck into the stock too. drop-shadow follows the
+               PNG's alpha, so this traces the wizard, not his bounding box. */
             .wizard {
                 width: 40px;
                 height: 40px;
                 image-rendering: pixelated;
                 flex-shrink: 0;
+                opacity: 0.93;
+                filter:
+                    saturate(0.92)
+                    drop-shadow(0 1px 0 hsl(40 60% 100% / .95))
+                    drop-shadow(0 -1px 0 hsl(28 35% 28% / .3));
+            }
+            .location {
+                font-family: var(--mono);
+                font-size: 0.7rem;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: var(--ink-soft);
+                margin: 0.5rem 0 0;
+                text-shadow: var(--deboss-soft);
+            }
+            /* The rule every business card has between name and details. */
+            .card-rule {
+                border: 0;
+                border-top: 1px solid hsl(30,16%,86%);
+                border-bottom: 1px solid hsl(40 50% 100% / .8);
+                margin: 1.3rem 0;
             }
             .links {
                 display: grid;
@@ -143,6 +203,7 @@
                 font-family: var(--mono);
                 letter-spacing: 0.02em;
                 white-space: nowrap;
+                text-shadow: var(--deboss-soft);
             }
             .link-value {
                 font-size: 0.92rem;
@@ -176,6 +237,7 @@
                 letter-spacing: -0.01em;
                 margin: 0 0 1.5rem;
                 color: var(--ink-strong);
+                text-shadow: var(--deboss);
             }
             h3 {
                 font-size: 1rem;
@@ -211,6 +273,46 @@
                 font-style: italic;
                 font-size: 0.88em;
                 color: hsl(28,24%,38%);
+            }
+
+            /* ── Print: the front page comes out at actual card size ──
+               3.5 × 2 in is the US trim. Cut on the hairline. */
+            @media print {
+                body {
+                    background: none;
+                    padding: 0.5in;
+                }
+                .paper {
+                    max-width: none;
+                    background: none;
+                    border-radius: 0;
+                    box-shadow: none;
+                    transform: none;
+                    padding: 0;
+                }
+                .paper.card {
+                    width: 3.5in;
+                    height: 2in;
+                    min-height: 0;
+                    padding: 0.26in 0.3in;
+                    outline: 1px dashed hsl(30,10%,70%);
+                    font-size: 8.5pt;
+                    line-height: 1.45;
+                }
+                /* Ink on paper needs no simulated ink on paper. */
+                h1.name, h2.page-title, .location, .link-label {
+                    text-shadow: none;
+                }
+                .wizard { filter: none; opacity: 1; }
+                .paper.card h1.name   { font-size: 15pt; }
+                .paper.card .location { font-size: 5.5pt; }
+                .paper.card .card-rule { margin: 0.1in 0; border-bottom: 0; }
+                .paper.card .name-row { gap: 0.09in; }
+                .paper.card .wizard { width: 0.3in; height: 0.3in; }
+                .paper.card .links { gap: 0.02in 0.24in; }
+                .paper.card .link-label { font-size: 6pt; }
+                .paper.card .link-value { font-size: 7.5pt; }
+                a { color: inherit; text-decoration: none; }
             }
         </style>
 

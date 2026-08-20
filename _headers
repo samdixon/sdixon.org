@@ -1,0 +1,10 @@
+# Cloudflare Pages header rules. Copied into build/ by the Makefile.
+
+# Static assets aren't content-hashed, so no `immutable` — a day of caching
+# with a week of background revalidation keeps them updatable.
+/static/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

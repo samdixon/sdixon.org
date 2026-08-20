@@ -17,3 +17,4 @@ runserver:
 
 build: requirements.txt
 	uv run build.py
+	cp _headers build/_headers
