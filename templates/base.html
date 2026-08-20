@@ -16,7 +16,8 @@
         <meta name="twitter:description" content="Personal website of Sam Dixon." />
         <meta name="twitter:image" content="https://sdixon.org/static/img/wizard.png" />
         <link rel="icon" href="/static/img/wizard.png" sizes="any" />
-        <title>sdixon</title>
+        <meta name="theme-color" content="#dcd6d0" />
+        <title>{% block title %}Sam Dixon{% endblock %}</title>
     </head>
     <body>
         <style>
@@ -33,6 +34,7 @@
                 --ink: hsl(28,26%,25%);
                 --ink-strong: hsl(28,30%,18%);
                 --ink-soft: hsl(28,20%,42%);
+                --ink-role: hsl(28,22%,36%);
                 --rule: hsl(28,15%,86%);
 
                 /* Accent picked off the wizard's robe. */
@@ -97,6 +99,13 @@
             /* Front page keeps roughly the proportions of a real 3.5×2in card. */
             .paper.card {
                 min-height: 14.9rem;
+                display: flex;
+                flex-direction: column;
+            }
+            .paper.card > main {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
             }
             /* Inner pages are the same stock, just a taller sheet — squared up,
                because you read them. */
@@ -144,6 +153,11 @@
             p {
                 margin: 1rem 0;
             }
+            ::selection {
+                background: hsl(215 45% 34% / .17);
+                color: var(--ink-strong);
+                text-shadow: none;
+            }
 
             /* ── Frontpage ─────────────────────────────── */
             .name-row {
@@ -173,13 +187,26 @@
                     drop-shadow(0 1px 0 hsl(40 60% 100% / .95))
                     drop-shadow(0 -1px 0 hsl(28 35% 28% / .3));
             }
+            /* Role sits under the name, the way a card is set. */
+            .role {
+                font-size: 0.9rem;
+                font-style: italic;
+                color: var(--ink-role);
+                margin: 0.3rem 0 0;
+                text-shadow: var(--deboss-soft);
+            }
+            /* Address goes in the bottom corner, also the way a card is set. */
+            .card-foot {
+                margin-top: auto;
+                padding-top: 1.2rem;
+            }
             .location {
                 font-family: var(--mono);
                 font-size: 0.7rem;
                 letter-spacing: 0.14em;
                 text-transform: uppercase;
                 color: var(--ink-soft);
-                margin: 0.5rem 0 0;
+                margin: 0;
                 text-shadow: var(--deboss-soft);
             }
             /* The rule every business card has between name and details. */

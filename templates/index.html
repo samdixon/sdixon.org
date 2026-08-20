@@ -8,7 +8,7 @@
     <img class="wizard" src="/static/img/wizard.png" width="40" height="40" alt="" />
     <h1 class="name">Sam Dixon</h1>
 </div>
-<p class="location">Indianapolis, IN</p>
+<p class="role">generalist &middot; dev, ops, data, cloud</p>
 
 <hr class="card-rule" />
 
@@ -23,9 +23,13 @@
     </div>
     <div class="link-row">
         <span class="link-label">hits</span>
-        <span class="link-value"><a href="{{ url_for('hits') }}">↝</a></span>
+        <span class="link-value"><a href="{{ url_for('hits') }}">things worth sharing ↝</a></span>
     </div>
 </div>
+
+<footer class="card-foot">
+    <p class="location">Indianapolis, IN</p>
+</footer>
 </main>
 
 {% endblock %}
