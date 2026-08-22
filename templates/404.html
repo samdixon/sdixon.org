@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}404 — Sam Dixon{% endblock %}
+
+{% block stock %}card{% endblock %}
+
+{% block page %}
+<main>
+<div class="name-row">
+    <img class="wizard fallen" src="/static/img/wizard_dead.png" width="41" height="28" alt="" />
+    <h1 class="name">404</h1>
+</div>
+<p class="role">page not found</p>
+
+<hr class="card-rule" />
+
+<div class="links">
+    <div class="link-row">
+        <span class="link-label">home</span>
+        <span class="link-value"><a href="{{ url_for('index') }}">sam dixon ↜</a></span>
+    </div>
+    <div class="link-row">
+        <span class="link-label">hits</span>
+        <span class="link-value"><a href="{{ url_for('hits') }}">things worth sharing ↝</a></span>
+    </div>
+</div>
+
+<footer class="card-foot">
+    <p class="location">Whereabouts unknown</p>
+</footer>
+</main>
+{% endblock %}

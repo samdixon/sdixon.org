@@ -1,0 +1,305 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  sdixon.org: a private S3 bucket holding the frozen site, fronted by
+  CloudFront over Origin Access Control. Replaces Cloudflare Pages.
+
+  The bucket is not a website-hosting bucket and is not public. CloudFront
+  reaches it over the REST endpoint with a signed request, which means S3's
+  "index document in every directory" behaviour is unavailable — a viewer
+  request function makes up the difference (see RewriteFunction).
+
+Parameters:
+  DomainName:
+    Type: String
+    Description: >
+      Apex domain, e.g. sdixon.org. Leave empty to stand the distribution up
+      on its *.cloudfront.net name only — useful for a first deploy, before
+      any DNS is pointed at it.
+    Default: ''
+
+  CertificateArn:
+    Type: String
+    Description: >
+      us-east-1 ACM certificate ARN, from the cert stack. Required to serve
+      DomainName; without it the distribution ignores DomainName and keeps
+      the default CloudFront certificate.
+    Default: ''
+
+  IncludeWww:
+    Type: String
+    Description: Also serve www.<DomainName>. The certificate must cover it.
+    Default: 'false'
+    AllowedValues: ['true', 'false']
+
+  HostedZoneId:
+    Type: String
+    Description: >
+      Route 53 hosted zone for DomainName. If set, alias records are created
+      pointing at the distribution. Leave empty if DNS lives elsewhere and
+      point a CNAME/ALIAS at the DistributionDomainName output by hand.
+    Default: ''
+
+  PriceClass:
+    Type: String
+    Description: PriceClass_100 is North America + Europe, and is the cheapest.
+    Default: PriceClass_100
+    AllowedValues: [PriceClass_100, PriceClass_200, PriceClass_All]
+
+Conditions:
+  HasDomain: !Not [!Equals [!Ref DomainName, '']]
+  HasCert: !Not [!Equals [!Ref CertificateArn, '']]
+  HasZone: !Not [!Equals [!Ref HostedZoneId, '']]
+  # Aliases are only safe to attach once a certificate covers them, so the
+  # two travel together — a domain without a cert is treated as no domain.
+  HasCustomDomain: !And [!Condition HasDomain, !Condition HasCert]
+  HasWww: !And
+    - !Condition HasCustomDomain
+    - !Equals [!Ref IncludeWww, 'true']
+  MakeApexRecords: !And [!Condition HasCustomDomain, !Condition HasZone]
+  MakeWwwRecords: !And [!Condition HasWww, !Condition HasZone]
+
+Resources:
+  # ── Origin ──────────────────────────────────────────────────────────────
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    # A bucket with objects in it cannot be deleted by CloudFormation anyway;
+    # retaining it turns a guaranteed DELETE_FAILED into a clean stack delete.
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub '${AWS::StackName}-oac'
+        Description: Signs CloudFront's requests to the site bucket.
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          # Only this one distribution can read the bucket. The SourceArn
+          # condition is what stops any other account's distribution from
+          # pointing at it.
+          - Sid: AllowCloudFrontRead
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub '${SiteBucket.Arn}/*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${Distribution}'
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: '*'
+            Action: s3:*
+            Resource:
+              - !GetAtt SiteBucket.Arn
+              - !Sub '${SiteBucket.Arn}/*'
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+
+  # ── Edge behaviour ──────────────────────────────────────────────────────
+  RewriteFunction:
+    Type: AWS::CloudFront::Function
+    Properties:
+      Name: !Sub '${AWS::StackName}-index-rewrite'
+      AutoPublish: true
+      FunctionConfig:
+        Comment: Maps directory-style URLs onto the index.html keys in S3.
+        Runtime: cloudfront-js-2.0
+      FunctionCode: |
+        // Frozen-Flask writes about/index.html, not about.html, and an S3
+        // REST origin will not find an index document on its own. Rewrite
+        // the request before it leaves the edge:
+        //
+        //   /            -> /index.html   (also covered by DefaultRootObject)
+        //   /about/      -> /about/index.html
+        //   /about       -> /about/index.html
+        //   /static/x.png-> untouched
+        function handler(event) {
+            var request = event.request;
+            var uri = request.uri;
+
+            if (uri.charAt(uri.length - 1) === '/') {
+                request.uri = uri + 'index.html';
+            } else if (uri.lastIndexOf('.') <= uri.lastIndexOf('/')) {
+                // No dot in the final path segment, so it is a directory
+                // rather than a file.
+                request.uri = uri + '/index.html';
+            }
+
+            return request;
+        }
+
+  ResponseHeadersPolicy:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: !Sub '${AWS::StackName}-security-headers'
+        Comment: The two headers the Cloudflare _headers file used to set.
+        SecurityHeadersConfig:
+          ContentTypeOptions:
+            Override: true
+          ReferrerPolicy:
+            ReferrerPolicy: strict-origin-when-cross-origin
+            Override: true
+          # Deliberately not enabling HSTS here. Cloudflare may have been
+          # adding it at its edge, so this is a real change in behaviour --
+          # but a max-age is a promise browsers cache and will not let you
+          # take back early, so it should be a decision, not a side effect of
+          # a migration. To turn it on, uncomment and deploy:
+          #
+          # StrictTransportSecurity:
+          #   AccessControlMaxAgeSec: 31536000
+          #   IncludeSubdomains: true
+          #   Preload: false
+          #   Override: true
+
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: !Sub '${AWS::StackName} static site'
+        DefaultRootObject: index.html
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        PriceClass: !Ref PriceClass
+        Aliases: !If
+          - HasCustomDomain
+          - !If
+            - HasWww
+            - [!Ref DomainName, !Sub 'www.${DomainName}']
+            - [!Ref DomainName]
+          - !Ref 'AWS::NoValue'
+        ViewerCertificate: !If
+          - HasCustomDomain
+          - AcmCertificateArn: !Ref CertificateArn
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2021
+          - CloudFrontDefaultCertificate: true
+        Origins:
+          - Id: SiteBucketOrigin
+            DomainName: !GetAtt SiteBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+            # Required to be present and empty: it is what selects the REST
+            # origin path rather than a custom (website endpoint) origin.
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+        DefaultCacheBehavior:
+          TargetOriginId: SiteBucketOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          Compress: true
+          AllowedMethods: [GET, HEAD]
+          CachedMethods: [GET, HEAD]
+          # Managed-CachingOptimized. Honours the Cache-Control that deploy.py
+          # writes onto each object, which is where the old _headers cache
+          # rule now lives.
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          ResponseHeadersPolicyId: !Ref ResponseHeadersPolicy
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt RewriteFunction.FunctionMetadata.FunctionARN
+        CustomErrorResponses:
+          # A missing key on an OAC origin comes back as 403, not 404, because
+          # the bucket policy grants GetObject and nothing else — there is no
+          # ListBucket permission for S3 to distinguish "absent" from
+          # "forbidden". Both map onto the same page.
+          - ErrorCode: 403
+            ResponseCode: 404
+            ResponsePagePath: /404.html
+            ErrorCachingMinTTL: 60
+          - ErrorCode: 404
+            ResponseCode: 404
+            ResponsePagePath: /404.html
+            ErrorCachingMinTTL: 60
+
+  # ── DNS (only when Route 53 holds the zone) ─────────────────────────────
+  ApexRecords:
+    Type: AWS::Route53::RecordSetGroup
+    Condition: MakeApexRecords
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      RecordSets:
+        - Name: !Ref DomainName
+          Type: A
+          AliasTarget:
+            DNSName: !GetAtt Distribution.DomainName
+            # Fixed, documented zone id for all CloudFront distributions.
+            HostedZoneId: Z2FDTNDATAQYW2
+            EvaluateTargetHealth: false
+        - Name: !Ref DomainName
+          Type: AAAA
+          AliasTarget:
+            DNSName: !GetAtt Distribution.DomainName
+            HostedZoneId: Z2FDTNDATAQYW2
+            EvaluateTargetHealth: false
+
+  WwwRecords:
+    Type: AWS::Route53::RecordSetGroup
+    Condition: MakeWwwRecords
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      RecordSets:
+        - Name: !Sub 'www.${DomainName}'
+          Type: A
+          AliasTarget:
+            DNSName: !GetAtt Distribution.DomainName
+            HostedZoneId: Z2FDTNDATAQYW2
+            EvaluateTargetHealth: false
+        - Name: !Sub 'www.${DomainName}'
+          Type: AAAA
+          AliasTarget:
+            DNSName: !GetAtt Distribution.DomainName
+            HostedZoneId: Z2FDTNDATAQYW2
+            EvaluateTargetHealth: false
+
+Outputs:
+  BucketName:
+    Description: Sync target for deploy.py.
+    Value: !Ref SiteBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-BucketName'
+
+  DistributionId:
+    Description: Invalidation target for deploy.py.
+    Value: !Ref Distribution
+    Export:
+      Name: !Sub '${AWS::StackName}-DistributionId'
+
+  DistributionDomainName:
+    Description: >
+      The *.cloudfront.net name. Point a CNAME (or Cloudflare proxied record)
+      here when DNS is not in Route 53.
+    Value: !GetAtt Distribution.DomainName
+    Export:
+      Name: !Sub '${AWS::StackName}-DistributionDomainName'
+
+  SiteUrl:
+    Description: Where the site answers once DNS resolves.
+    Value: !If
+      - HasCustomDomain
+      - !Sub 'https://${DomainName}'
+      - !Sub 'https://${Distribution.DomainName}'

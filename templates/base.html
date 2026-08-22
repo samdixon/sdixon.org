@@ -187,6 +187,15 @@
                     drop-shadow(0 1px 0 hsl(40 60% 100% / .95))
                     drop-shadow(0 -1px 0 hsl(28 35% 28% / .3));
             }
+            /* The mark on the 404 card is a wizard who isn't there any more.
+               His robes keep the place — same box, but slumped to the floor
+               of it, so the name beside them doesn't shift. */
+            .wizard.fallen {
+                width: 41px;
+                height: 28px;
+                align-self: flex-end;
+            }
+
             /* Role sits under the name, the way a card is set. */
             .role {
                 font-size: 0.9rem;
@@ -336,6 +345,7 @@
                 .paper.card .card-rule { margin: 0.1in 0; border-bottom: 0; }
                 .paper.card .name-row { gap: 0.09in; }
                 .paper.card .wizard { width: 0.3in; height: 0.3in; }
+                .paper.card .wizard.fallen { width: 0.31in; height: 0.21in; }
                 .paper.card .links { gap: 0.02in 0.24in; }
                 .paper.card .link-label { font-size: 6pt; }
                 .paper.card .link-value { font-size: 7.5pt; }

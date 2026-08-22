@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  ACM certificate for sdixon.org. Separate stack from site.yaml because
+  certificate creation blocks on DNS validation, which can take minutes to
+  hours depending on who runs the DNS — and you do not want the whole site
+  stack sitting in CREATE_IN_PROGRESS behind it.
+
+  MUST be deployed to us-east-1. CloudFront only reads certificates from
+  us-east-1, whatever region the bucket lives in.
+
+Parameters:
+  DomainName:
+    Type: String
+    Description: Apex domain, e.g. sdixon.org
+    AllowedPattern: '^[a-z0-9.-]+\.[a-z]{2,}$'
+
+  IncludeWww:
+    Type: String
+    Description: Also cover www.<DomainName> as a subject alternative name.
+    Default: 'false'
+    AllowedValues: ['true', 'false']
+
+  HostedZoneId:
+    Type: String
+    Description: >
+      Route 53 hosted zone for DomainName. If set, ACM writes its own
+      validation records and the stack completes on its own. Leave empty if
+      DNS lives somewhere else (Cloudflare, the registrar) — the stack will
+      then wait in CREATE_IN_PROGRESS until you copy the CNAME that ACM asks
+      for into that provider by hand. See README for how to read it out.
+    Default: ''
+
+Conditions:
+  HasWww: !Equals [!Ref IncludeWww, 'true']
+  HasZone: !Not [!Equals [!Ref HostedZoneId, '']]
+  SelfValidating: !And
+    - !Condition HasZone
+    - !Condition HasWww
+  SelfValidatingApexOnly: !And
+    - !Condition HasZone
+    - !Not [!Condition HasWww]
+
+Resources:
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref DomainName
+      ValidationMethod: DNS
+      SubjectAlternativeNames: !If
+        - HasWww
+        - [!Sub 'www.${DomainName}']
+        - !Ref 'AWS::NoValue'
+      # Naming the hosted zone is what lets ACM publish its own validation
+      # records. Without it ACM still asks for the same CNAMEs, it just waits
+      # for a human to add them.
+      DomainValidationOptions: !If
+        - SelfValidating
+        - - DomainName: !Ref DomainName
+            HostedZoneId: !Ref HostedZoneId
+          - DomainName: !Sub 'www.${DomainName}'
+            HostedZoneId: !Ref HostedZoneId
+        - !If
+          - SelfValidatingApexOnly
+          - - DomainName: !Ref DomainName
+              HostedZoneId: !Ref HostedZoneId
+          - !Ref 'AWS::NoValue'
+      Tags:
+        - Key: Site
+          Value: !Ref DomainName
+
+Outputs:
+  CertificateArn:
+    Description: Pass this to site.yaml as its CertificateArn parameter.
+    Value: !Ref Certificate
+    Export:
+      Name: !Sub '${AWS::StackName}-CertificateArn'
